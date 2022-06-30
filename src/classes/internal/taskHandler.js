@@ -17,6 +17,19 @@ export default class TaskHandler extends InternalClass {
     this.tasks.push(new Task(name, options));
   }
 
+  cancelAnimationAndClearCanvases() {
+    if (!this.isExecuting) {
+      this.cacheCanvas = null;
+      this.previousCanvas = null;
+    } else {
+      this.shouldCancelExecution = true;
+      this.onCancel = () => {
+        this.cacheCanvas = null;
+        this.previousCanvas = null;
+      };
+    }
+  }
+
   drawTurtle() {
     if (this.main.state.size == 0) {
       return;
@@ -45,12 +58,6 @@ export default class TaskHandler extends InternalClass {
       }
 
       this.isExecuting = true;
-
-      if (!this.main.options.async) {
-        this.cacheCanvas = null;
-
-        this.previousCanvas = null;
-      }
 
       if (this.tasks.length == 0) {
         reject();
@@ -157,7 +164,12 @@ export default class TaskHandler extends InternalClass {
       //Draw current canvas onto previous canvas
       if (this.previousCtx && this.previousCanvas && this.cacheCanvas) {
         // need to clear the previousCanvas because transparent pixels in the cacheCanvas wouldn't override filled pixels in the previousCanvas
-        this.previousCtx.clearRect(0, 0, this.previousCanvas.width, this.previousCanvas.height);
+        this.previousCtx.clearRect(
+          0,
+          0,
+          this.previousCanvas.width,
+          this.previousCanvas.height
+        );
         this.previousCtx.drawImage(this.cacheCanvas, 0, 0);
       }
 
@@ -177,10 +189,6 @@ export default class TaskHandler extends InternalClass {
         }
 
         this.isExecuting = false;
-
-        if (!this.main.options.async) {
-          this.cacheCanvas = null;
-        }
       } else {
         this.activeTaskFirstPaint = true;
         this.activeTaskKey++;
@@ -201,6 +209,26 @@ export default class TaskHandler extends InternalClass {
         */
         this.taskStartTime = new Date().getTime();
       }
+    }
+
+    if (this.shouldCancelExecution) {
+      this.executionFinished = true;
+
+      try {
+        this.onExecutionFinished();
+      } catch (e) {
+        /*nothing*/
+      }
+
+      this.isExecuting = false;
+
+      try {
+        this.onCancel();
+      } catch (e) {
+        /*nothing*/
+      }
+
+      this.shouldCancelExecution = false;
     }
 
     this.drawTurtle();

@@ -7,6 +7,12 @@ export default class MoveCommand extends Command {
   }
 
   estimate(main) {
+    if (main.options.unitsInMeters)
+      return {
+        requiredTime:
+          (1 - this.main.state.speed) * Math.abs(this.options.steps) * 1500,
+      };
+
     return {
       requiredTime:
         (1 - this.main.state.speed) * Math.abs(this.options.steps) * 5,
@@ -14,12 +20,25 @@ export default class MoveCommand extends Command {
   }
 
   prepare(main) {
-    this.moveX =
-      Math.cos(((this.state.rotation - 90) * Math.PI) / 180) *
-      this.options.steps;
-    this.moveY =
-      Math.sin(((this.state.rotation - 90) * Math.PI) / 180) *
-      this.options.steps;
+    if (main.options.unitsInMeters) {
+      const canvasSize = main.state.canvasSizeMeters;
+      const moveXMeters =
+        Math.sin((this.state.rotation * Math.PI) / 180) * this.options.steps;
+      const moveYMeters =
+        -1 *
+        Math.cos((this.state.rotation * Math.PI) / 180) *
+        this.options.steps;
+
+      this.moveX = (moveXMeters / canvasSize.x) * main.canvas.width;
+      this.moveY = (moveYMeters / canvasSize.y) * main.canvas.height;
+    } else {
+      this.moveX =
+        Math.sin((this.state.rotation * Math.PI) / 180) * this.options.steps;
+      this.moveY =
+        -1 *
+        Math.cos((this.state.rotation * Math.PI) / 180) *
+        this.options.steps;
+    }
   }
 
   async execute(progress, ctx) {

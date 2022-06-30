@@ -20,6 +20,11 @@ export default class TurtleState extends InternalClass {
     this.initialPosition = this.position;
     this.initialRotation = this.rotation;
 
+    this.canvasSizeMeters = {
+      x: this.main.canvas.width,
+      y: this.main.canvas.height,
+    };
+
     this.size = initialState.size;
 
     this.lineWidth = initialState.lineWidth;
@@ -59,6 +64,13 @@ export default class TurtleState extends InternalClass {
   resetPosition() {
     this.position = this.initialPosition;
     this.rotation = this.initialRotation;
+  }
+
+  setCanvasSizeMeters(sizeX, sizeY) {
+    this.canvasSizeMeters = {
+      x: sizeX,
+      y: sizeY,
+    };
   }
 
   setSize(size) {

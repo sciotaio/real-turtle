@@ -118,6 +118,14 @@ class RealTurtle {
       }
     }
   }
+
+  setCanvasDimensions(xMeters, yMeters) {
+    this.state.setCanvasSizeMeters(xMeters, yMeters);
+
+    this.taskHandler.cancelAnimationAndClearCanvases();
+    this.logger.add(`🐢 Setting new canvas dimensions`, { xMeters, yMeters });
+    // console.log("Setting new canvas dimensions ", xMeters, yMeters);
+  }
 }
 
 export default RealTurtle;

@@ -2,6 +2,7 @@ export default {
   verbose: false,
   async: false,
   autoStart: false,
+  unitsInMeters: false,
   state: {
     size: 15,
     strokeStyle: "black",
