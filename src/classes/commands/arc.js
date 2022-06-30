@@ -12,15 +12,23 @@ export default class ArcCommand extends Command {
   }
 
   estimate(main) {
-    var requiredTime =
-      (((1 - this.main.state.speed) * Math.abs(this.options.angle)) / 360) *
-      Math.PI *
-      2 *
-      this.options.radius *
-      5;
+    if (main.options.unitsInMeters)
+      return {
+        requiredTime:
+          (((1 - this.main.state.speed) * Math.abs(this.options.angle)) / 360) *
+          Math.PI *
+          2 *
+          this.options.radius *
+          1500,
+      };
 
     return {
-      requiredTime: requiredTime,
+      requiredTime:
+        (((1 - this.main.state.speed) * Math.abs(this.options.angle)) / 360) *
+        Math.PI *
+        2 *
+        this.options.radius *
+        5,
     };
   }
 
@@ -34,24 +42,53 @@ export default class ArcCommand extends Command {
       sideVariable = -sideVariable;
     }
 
-    this.arcCenterX =
-      this.initialState.position.x +
-      Math.sin((this.initialState.rotation + sideVariable) * (Math.PI / 180)) *
-        this.options.radius;
+    if (main.options.unitsInMeters) {
+      const canvasSize = main.state.canvasSizeMeters;
+      const arcCenterXMeters =
+        Math.sin(
+          (this.initialState.rotation + sideVariable) * (Math.PI / 180)
+        ) * this.options.radius;
+      this.arcCenterX =
+        this.initialState.position.x +
+        (arcCenterXMeters / canvasSize.x) * main.canvas.width;
 
-    this.arcCenterY =
-      this.initialState.position.y +
-      Math.cos((this.initialState.rotation + sideVariable) * (Math.PI / 180)) *
-        this.options.radius *
-        -1 /* because the canvas coordinate system is different*/;
+      const arcCenterYMeters =
+        Math.cos(
+          (this.initialState.rotation + sideVariable) * (Math.PI / 180)
+        ) * this.options.radius;
+      this.arcCenterY =
+        this.initialState.position.y -
+        (arcCenterYMeters / canvasSize.y) * main.canvas.height;
 
-    this.arcStartAngle =
+      this.radius = (this.options.radius / canvasSize.x) * main.canvas.width;
+      //could also look like this: this.radius = this.options.radius / canvasSize.y * main.canvas.height;
+      // since the pixels per meter are equal in x and y direction
+    } else {
+      this.arcCenterX =
+        this.initialState.position.x +
+        Math.sin(
+          (this.initialState.rotation + sideVariable) * (Math.PI / 180)
+        ) *
+          this.options.radius;
+
+      this.arcCenterY =
+        this.initialState.position.y +
+        Math.cos(
+          (this.initialState.rotation + sideVariable) * (Math.PI / 180)
+        ) *
+          this.options.radius *
+          -1 /* because the canvas coordinate system is different*/;
+
+      this.radius = this.options.radius;
+    }
+
+    this.arcStartAngle = // 0 is the positive x axis
       (this.options.counterclockwise ? 0 : 180) + this.initialState.rotation;
   }
 
   async execute(progress, ctx) {
     return new Promise((resolve) => {
-      var currentAngle =
+      var currentAngle = // 0 is the positive x axis
         this.arcStartAngle +
         this.options.angle *
           progress *
@@ -59,10 +96,10 @@ export default class ArcCommand extends Command {
 
       var xNow =
         this.arcCenterX +
-        Math.cos(currentAngle * (Math.PI / 180)) * this.options.radius;
+        Math.cos(currentAngle * (Math.PI / 180)) * this.radius;
       var yNow =
         this.arcCenterY +
-        Math.sin(currentAngle * (Math.PI / 180)) * this.options.radius;
+        Math.sin(currentAngle * (Math.PI / 180)) * this.radius;
 
       if (!this.state.pathActive || ctx == this.main.ctx) {
         ctx.beginPath();
@@ -71,7 +108,7 @@ export default class ArcCommand extends Command {
       ctx.arc(
         this.arcCenterX,
         this.arcCenterY,
-        this.options.radius,
+        this.radius,
         this.arcStartAngle * (Math.PI / 180),
         currentAngle * (Math.PI / 180),
         this.options.counterclockwise

@@ -12,14 +12,28 @@ export default class SetPositionCommand extends Command {
     };
   }
 
-  prepare(main) {}
+  prepare(main) {
+    if (main.options.unitsInMeters) {
+      const canvasSize = main.state.canvasSizeMeters;
+      this.setX = (this.options.x / canvasSize.x) * main.canvas.width;
+      this.setY = (this.options.y / canvasSize.y) * main.canvas.height;
+
+      //relative to initial position:
+      // const initialPosition = main.state.initialPosition;
+      // this.setX =
+      //   initialPosition.x + (this.options.x / canvasSize.x) * main.canvas.width;
+      // this.setY =
+      //   initialPosition.y -
+      //   (this.options.y / canvasSize.y) * main.canvas.height;
+    } else {
+      this.setX = this.options.x;
+      this.setY = this.options.y;
+    }
+  }
 
   async execute(progress, ctx) {
     return new Promise((resolve) => {
-      var xNow = this.options.x + this.initialState.position.x * (1 - progress);
-      var yNow = this.options.y + this.initialState.position.y * (1 - progress);
-
-      this.state.setPosition(xNow, yNow);
+      this.state.setPosition(this.setX, this.setY);
       resolve();
     });
   }

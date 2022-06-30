@@ -4,7 +4,7 @@ export default {
   autoStart: false,
   unitsInMeters: false,
   state: {
-    size: 15,
+    size: 12,
     strokeStyle: "black",
     fillStyle: "black",
     lineCap: "round",
