@@ -10,7 +10,7 @@ export default class MoveCommand extends Command {
     if (main.options.unitsInMeters)
       return {
         requiredTime:
-          (1 - this.main.state.speed) * Math.abs(this.options.steps) * 1500,
+          (1 - this.main.state.speed) * Math.abs(this.options.steps) * 1000,
       };
 
     return {

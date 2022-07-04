@@ -51,6 +51,8 @@ class RealTurtle {
       this.registerCommand(commandNames[i], commands[commandNames[i]]);
     }
 
+    this.registerGPSFunc();
+
     if (this.options.autoStart == true) {
       setTimeout(() => {
         this.start();
@@ -124,7 +126,24 @@ class RealTurtle {
 
     this.taskHandler.cancelAnimationAndClearCanvases();
     this.logger.add(`🐢 Setting new canvas dimensions`, { xMeters, yMeters });
-    // console.log("Setting new canvas dimensions ", xMeters, yMeters);
+  }
+
+  setCanvasLatLngBounds(latLngBounds) {
+    this.state.setCanvasLatLngBounds(latLngBounds);
+
+    this.taskHandler.cancelAnimationAndClearCanvases();
+    this.logger.add(`🐢 Setting new canvas lat lng bounds`, latLngBounds);
+  }
+
+  registerGPSFunc() {
+    var func = new Function(
+      "lat",
+      "long",
+      `
+      return {lat, long}
+    `
+    );
+    this["gps"] = func;
   }
 }
 

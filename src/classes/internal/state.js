@@ -25,6 +25,11 @@ export default class TurtleState extends InternalClass {
       y: this.main.canvas.height,
     };
 
+    this.canvasLatLngBounds = [
+      [0, 0],
+      [0, 0],
+    ];
+
     this.size = initialState.size;
 
     this.lineWidth = initialState.lineWidth;
@@ -71,6 +76,10 @@ export default class TurtleState extends InternalClass {
       x: sizeX,
       y: sizeY,
     };
+  }
+
+  setCanvasLatLngBounds(latLngBounds) {
+    this.canvasLatLngBounds = latLngBounds;
   }
 
   setSize(size) {
