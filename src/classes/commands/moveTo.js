@@ -32,7 +32,7 @@ export default class MoveToCommand extends Command {
       (1 - main.state.speed) * Math.abs(this.moveDistance) * moveSpeedFactor;
 
     this.requiredTime = turnTime + moveTime;
-    console.log("req time: ", this.requiredTime, turnTime, moveTime);
+
     if (this.requiredTime > 0)
       this.turnDurationProportion = turnTime / this.requiredTime;
     //speed is 1 or turtle doesn't need to move
@@ -112,14 +112,10 @@ export default class MoveToCommand extends Command {
         canvasLatLngBounds[0][0]); //south latitude
     const y = (canvasLatLngBounds[1][0] - lat) * pixelPerDegreeLat; // y axis is at the north bound (y = 0 is the top)
 
-    console.log("canvas lat lng", canvasLatLngBounds);
-    console.log("lat, long", lat, long);
-
     const targetPos = {
       x: x,
       y: y,
     };
-    console.log("target:", targetPos);
 
     this.moveX = targetPos.x - curPos.x;
     this.moveY = targetPos.y - curPos.y;
@@ -157,7 +153,6 @@ export default class MoveToCommand extends Command {
       x: initialPos.x + xOffset,
       y: initialPos.y + yOffset,
     };
-    console.log("target:", targetPos);
 
     this.moveX = targetPos.x - curPos.x;
     this.moveY = targetPos.y - curPos.y;
@@ -193,7 +188,6 @@ export default class MoveToCommand extends Command {
       x: initialPos.x + xOffset,
       y: initialPos.y + yOffset,
     };
-    console.log("target:", targetPos);
 
     this.moveX = targetPos.x - curPos.x;
     this.moveY = targetPos.y - curPos.y;
@@ -214,8 +208,6 @@ export default class MoveToCommand extends Command {
     const movingVector = [this.moveX, this.moveY];
     const yAxisVector = [0, -1]; //a vector pointing up in the canvas (equals turtle rotation 0)
 
-    console.log("moving v", movingVector);
-
     const angle =
       (Math.acos(
         this.dot(movingVector, yAxisVector) /
@@ -223,8 +215,6 @@ export default class MoveToCommand extends Command {
       ) *
         180) /
       Math.PI;
-
-    console.log("angle", angle);
 
     let targetRot;
     if (movingVector[0] < 0)
@@ -237,7 +227,5 @@ export default class MoveToCommand extends Command {
 
     if (rotationDiff > 180) this.degrees = -1 * (360 - rotationDiff);
     else this.degrees = rotationDiff;
-
-    console.log("degrees: ", this.degrees);
   }
 }

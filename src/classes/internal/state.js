@@ -15,7 +15,9 @@ export default class TurtleState extends InternalClass {
         : this.main.canvas.height / 2,
     };
 
-    this.rotation = initialState.rotation ? initialState.rotation : 0;
+    this.rotation = initialState.rotation
+      ? this.clampRotation(initialState.rotation)
+      : 0;
 
     this.initialPosition = this.position;
     this.initialRotation = this.rotation;
@@ -55,7 +57,7 @@ export default class TurtleState extends InternalClass {
   }
 
   setRotation(deg) {
-    this.rotation = deg;
+    this.rotation = this.clampRotation(deg);
   }
 
   setInitialPosition(x, y) {
@@ -63,7 +65,7 @@ export default class TurtleState extends InternalClass {
   }
 
   setInitialRotation(deg) {
-    this.initialRotation = deg;
+    this.initialRotation = this.clampRotation(deg);
   }
 
   resetPosition() {
@@ -159,5 +161,9 @@ export default class TurtleState extends InternalClass {
         image: this.image,
       })
     );
+  }
+
+  clampRotation(rotation) {
+    return ((rotation % 360) + 360) % 360; // works for both positive and negative numbers
   }
 }
