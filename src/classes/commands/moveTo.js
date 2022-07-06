@@ -10,12 +10,12 @@ export default class MoveToCommand extends Command {
   }
 
   estimate(main) {
-    let moveSpeedFactor = 6; //ms per pixel
-
+    const moveSpeedFactor = main.options.unitsInMeters
+      ? this.state.msPerMeter
+      : this.state.msPerPixel;
     // "front" and "right" relative to initial position have been given
     if (this.options.front !== undefined) {
       if (main.options.unitsInMeters) {
-        moveSpeedFactor = 1000; //ms per meter
         this.calculateValuesForMeters(main);
       } else {
         this.calculateValuesForPixels(main);
@@ -124,6 +124,10 @@ export default class MoveToCommand extends Command {
       Math.pow(this.moveX, 2) + Math.pow(this.moveY, 2)
     );
 
+    if (main.options.unitsInMeters)
+      this.moveDistance =
+        (this.moveDistance * this.state.canvasSizeMeters.x) / main.canvas.width; // convert to meters
+
     if (this.moveDistance == 0) {
       this.degrees = 0;
       return;
@@ -161,7 +165,7 @@ export default class MoveToCommand extends Command {
       Math.pow(this.moveX, 2) + Math.pow(this.moveY, 2)
     );
 
-    this.moveDistance = (moveDistancePx * canvasSize.x) / main.canvas.width; //convert to meters for time calculation
+    this.moveDistance = (moveDistancePx * canvasSize.x) / main.canvas.width;
 
     if (this.moveDistance == 0) {
       this.degrees = 0;

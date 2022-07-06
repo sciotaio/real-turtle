@@ -50,6 +50,9 @@ export default class TurtleState extends InternalClass {
 
     this.speed = initialState.speed;
     this.image = { url: null, object: null };
+
+    this.msPerPixel = 10;
+    this.msPerMeter = 400;
   }
 
   setPosition(x, y) {

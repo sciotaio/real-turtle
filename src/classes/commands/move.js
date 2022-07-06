@@ -7,15 +7,20 @@ export default class MoveCommand extends Command {
   }
 
   estimate(main) {
-    if (main.options.unitsInMeters)
+    if (main.options.unitsInMeters) {
       return {
         requiredTime:
-          (1 - this.main.state.speed) * Math.abs(this.options.steps) * 1000,
+          (1 - this.main.state.speed) *
+          Math.abs(this.options.steps) *
+          this.state.msPerMeter,
       };
+    }
 
     return {
       requiredTime:
-        (1 - this.main.state.speed) * Math.abs(this.options.steps) * 5,
+        (1 - this.main.state.speed) *
+        Math.abs(this.options.steps) *
+        this.state.msPerPixel,
     };
   }
 

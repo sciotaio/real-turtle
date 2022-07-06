@@ -12,15 +12,16 @@ export default class ArcCommand extends Command {
   }
 
   estimate(main) {
-    if (main.options.unitsInMeters)
+    if (main.options.unitsInMeters) {
       return {
         requiredTime:
           (((1 - this.main.state.speed) * Math.abs(this.options.angle)) / 360) *
           Math.PI *
           2 *
           this.options.radius *
-          1500,
+          this.state.msPerMeter,
       };
+    }
 
     return {
       requiredTime:
@@ -28,7 +29,7 @@ export default class ArcCommand extends Command {
         Math.PI *
         2 *
         this.options.radius *
-        5,
+        this.state.msPerPixel,
     };
   }
 
