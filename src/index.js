@@ -60,7 +60,7 @@ class RealTurtle {
     }
   }
 
-  start() {
+  start(onFinish, params) {
     // When imge loaded
     this.state
       .setImage(this.options.image)
@@ -70,6 +70,15 @@ class RealTurtle {
       .then(() => {
         //clear the tasks from the list that have already been executed
         this.taskHandler.tasks = [];
+        if (onFinish && typeof onFinish == "function") onFinish(params);
+      })
+      .catch((reason) => {
+        if (reason instanceof Error)
+          if (
+            reason.message != "Is already executing." &&
+            reason.message != "No tasks to execute."
+          )
+            console.log(reason);
       });
   }
 
@@ -124,14 +133,14 @@ class RealTurtle {
   setCanvasDimensions(xMeters, yMeters) {
     this.state.setCanvasSizeMeters(xMeters, yMeters);
 
-    this.taskHandler.cancelAnimationAndClearCanvases();
+    this.taskHandler.clearCanvases();
     this.logger.add(`🐢 Setting new canvas dimensions`, { xMeters, yMeters });
   }
 
   setCanvasLatLngBounds(latLngBounds) {
     this.state.setCanvasLatLngBounds(latLngBounds);
 
-    this.taskHandler.cancelAnimationAndClearCanvases();
+    this.taskHandler.clearCanvases();
     this.logger.add(`🐢 Setting new canvas lat lng bounds`, latLngBounds);
   }
 

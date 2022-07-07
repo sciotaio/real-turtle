@@ -17,23 +17,17 @@ export default class TaskHandler extends InternalClass {
     this.tasks.push(new Task(name, options));
   }
 
-  cancelAnimationAndClearCanvases() {
-    if (!this.isExecuting) {
-      this.cacheCanvas = null;
-      this.previousCanvas = null;
-    } else {
-      this.shouldCancelExecution = true;
-      this.onCancel = () => {
-        this.cacheCanvas = null;
-        this.previousCanvas = null;
-      };
-    }
+  clearCanvases() {
+    this.cacheCanvas = null;
+    this.previousCanvas = null;
   }
 
   drawTurtle() {
     if (this.main.state.size == 0) {
       return;
     }
+
+    // console.log("drawing turtle");
 
     var angleInRadians = this.main.state.rotation * (Math.PI / 180);
 
@@ -53,14 +47,14 @@ export default class TaskHandler extends InternalClass {
   async executeTasks() {
     return new Promise((resolve, reject) => {
       if (this.isExecuting) {
-        reject();
+        reject(new Error("Is already executing."));
         return;
       }
 
       this.isExecuting = true;
 
       if (this.tasks.length == 0) {
-        reject();
+        reject(new Error("No tasks to execute."));
         return;
       }
 
@@ -75,6 +69,7 @@ export default class TaskHandler extends InternalClass {
       }
 
       this.executionFinished = false;
+      this.shouldCancelExecution = false;
 
       this.executionStartTime = new Date().getTime();
       this.taskStartTime = this.executionStartTime;
@@ -84,28 +79,6 @@ export default class TaskHandler extends InternalClass {
       this.activeTaskEstimationCallback = this.taskEstimationCallbacks[0];
       this.activeTaskProgress = 0;
       this.activeTaskFirstPaint = true;
-
-      if (!this.cacheCanvas) {
-        //Create the cache canvas which gets updated once a step is finished
-        //It enables the library to ensure that canvas steps are executed "natively" regardless of any animations
-        //.fill() is made possible by this for example
-
-        this.cacheCanvas = document.createElement("canvas");
-        this.cacheCanvas.width = this.canvas.width;
-        this.cacheCanvas.height = this.canvas.height;
-        this.cacheCtx = this.cacheCanvas.getContext("2d");
-        this.cacheCtx.drawImage(this.canvas, 0, 0);
-      }
-
-      if (!this.previousCanvas) {
-        //Create the cache canvas which gets updated everytime a new step is finished
-
-        this.previousCanvas = document.createElement("canvas");
-        this.previousCanvas.width = this.canvas.width;
-        this.previousCanvas.height = this.canvas.height;
-        this.previousCtx = this.previousCanvas.getContext("2d");
-        this.previousCtx.drawImage(this.canvas, 0, 0);
-      }
 
       this.drawTurtle();
 
@@ -117,6 +90,32 @@ export default class TaskHandler extends InternalClass {
   }
 
   async executeDrawingStep() {
+    if (!this.previousCanvas) {
+      //Create the cache canvas which gets updated everytime a new step is finished
+
+      this.previousCanvas = document.createElement("canvas");
+      this.previousCanvas.width = this.canvas.width;
+      this.previousCanvas.height = this.canvas.height;
+      this.previousCtx = this.previousCanvas.getContext("2d");
+      this.previousCtx.drawImage(this.canvas, 0, 0);
+
+      // console.log("saving to prev");
+    }
+
+    if (!this.cacheCanvas) {
+      //Create the cache canvas which gets updated once a step is finished
+      //It enables the library to ensure that canvas steps are executed "natively" regardless of any animations
+      //.fill() is made possible by this for example
+
+      this.cacheCanvas = document.createElement("canvas");
+      this.cacheCanvas.width = this.canvas.width;
+      this.cacheCanvas.height = this.canvas.height;
+      this.cacheCtx = this.cacheCanvas.getContext("2d");
+      this.cacheCtx.drawImage(this.canvas, 0, 0);
+
+      // console.log("saving to cache");
+    }
+
     // Calculate progress
     if (this.main.state.speed < 1) {
       var timeNow = new Date().getTime();
@@ -171,6 +170,7 @@ export default class TaskHandler extends InternalClass {
           this.previousCanvas.height
         );
         this.previousCtx.drawImage(this.cacheCanvas, 0, 0);
+        // console.log("saving to prev after task");
       }
 
       if (this.cacheCanvas) {
