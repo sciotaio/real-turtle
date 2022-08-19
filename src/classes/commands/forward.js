@@ -8,6 +8,14 @@ export default class ForwardCommand extends Command {
   static params = { steps: new Number() };
 
   constructor(options) {
+    const argTypesAreCorrect = typeof options["steps"] == "number";
+
+    if (!argTypesAreCorrect) {
+      console.log(
+        "🐢 Incorrect argument type for command 'forward', defaulting."
+      );
+      options["steps"] = 0;
+    }
     super(options);
   }
 

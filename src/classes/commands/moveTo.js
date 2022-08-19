@@ -6,6 +6,22 @@ export default class MoveToCommand extends Command {
   static aliases = ["to"];
 
   constructor(options) {
+    const argTypesAreCorrect =
+      (typeof options["right"] == "number" &&
+        typeof options["front"] == "number") ||
+      (typeof options["right"] == "object" &&
+        options["right"] !== null &&
+        typeof options["front"] == "undefined" &&
+        typeof options["right"]["lat"] == "number" &&
+        typeof options["right"]["long"] == "number");
+
+    if (!argTypesAreCorrect) {
+      console.log(
+        "🐢 Incorrect argument type(s) for command 'moveTo', defaulting."
+      );
+      options["right"] = 0;
+      options["front"] = 0;
+    }
     super(options);
   }
 

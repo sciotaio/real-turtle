@@ -8,6 +8,12 @@ export default class BackCommand extends Command {
   static params = { steps: new Number() };
 
   constructor(options) {
+    const argTypesAreCorrect = typeof options["steps"] == "number";
+
+    if (!argTypesAreCorrect) {
+      console.log("🐢 Incorrect argument type for command 'back', defaulting.");
+      options["steps"] = 0;
+    }
     super(options);
   }
 

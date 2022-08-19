@@ -8,6 +8,20 @@ export default class ArcCommand extends Command {
   };
 
   constructor(options) {
+    const argTypesAreCorrect =
+      typeof options["radius"] == "number" &&
+      typeof options["angle"] == "number" &&
+      (typeof options["counterclockwise"] == "undefined" ||
+        typeof options["counterclockwise"] == "boolean");
+
+    if (!argTypesAreCorrect) {
+      console.log(
+        "🐢 Incorrect argument type(s) for command 'arc', defaulting."
+      );
+      options["radius"] = 0;
+      options["angle"] = 0;
+      options["counterclockwise"] = false;
+    }
     super(options);
   }
 

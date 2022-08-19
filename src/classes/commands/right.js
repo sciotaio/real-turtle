@@ -8,6 +8,14 @@ export default class LeftCommand extends Command {
   static params = { degrees: new Number() };
 
   constructor(options) {
+    const argTypesAreCorrect = typeof options["degrees"] == "number";
+
+    if (!argTypesAreCorrect) {
+      console.log(
+        "🐢 Incorrect argument type for command 'right', defaulting."
+      );
+      options["degrees"] = 0;
+    }
     super(options);
   }
 
